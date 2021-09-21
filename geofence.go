@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net"
+	"net/http"
 	"os"
 	"sync"
 
@@ -60,10 +61,10 @@ func (conf Config) Access(kong *pdk.PDK) {
 	})
 	if db == nil {
 		_ = kong.ServiceRequest.SetHeader("X-Detected-Country-Error", fmt.Sprintf("GeoIP database not ready: %v", dbErr))
-		//headers := map[string][]string{
-		//	"X-Kong-Geofence": {"active"},
-		//}
-		//kong.Response.Exit(http.StatusForbidden, "No GeoIP database", headers)
+		headers := map[string][]string{
+			"X-Kong-Geofence": {"active"},
+		}
+		kong.Response.Exit(http.StatusForbidden, fmt.Sprintf("GeoIP database not ready: %v", dbErr), headers)
 		return
 	}
 	clientIP, err := kong.Client.GetIp()
