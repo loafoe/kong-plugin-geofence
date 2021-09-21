@@ -66,7 +66,7 @@ func (conf Config) Access(kong *pdk.PDK) {
 		kong.Response.Exit(http.StatusForbidden, fmt.Sprintf("GeoIP database not ready: %v", dbErr), headers)
 		return
 	}
-	clientIP, err := kong.Client.GetIp()
+	clientIP, err := kong.Client.GetForwardedIp()
 	if err != nil {
 		_ = kong.ServiceRequest.SetHeader("X-Detected-Country-Error", err.Error())
 		return
@@ -84,5 +84,5 @@ func (conf Config) Access(kong *pdk.PDK) {
 }
 
 func main() {
-	server.StartServer(New, "0.1", 1000)
+	_ = server.StartServer(New, "0.1", 1000)
 }
