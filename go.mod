@@ -6,6 +6,7 @@ require (
 	github.com/Kong/go-pdk v0.6.0
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/kr/pretty v0.3.0 // indirect
+	github.com/loafoe/mmdb v0.0.0-20210921132742-d3cfe9a274d2
 	github.com/oschwald/geoip2-golang v1.5.0
 	github.com/rogpeppe/go-internal v1.8.0 // indirect
 	golang.org/x/sys v0.0.0-20210806184541-e5e7981a1069 // indirect
