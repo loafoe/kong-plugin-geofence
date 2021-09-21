@@ -16,7 +16,7 @@ import (
 type Config struct {
 }
 
-// New
+//nolint
 func New() interface{} {
 	return &Config{}
 }
