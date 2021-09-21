@@ -8,12 +8,12 @@ COPY go.sum .
 RUN go mod download
 # Build
 COPY . .
-RUN go build -buildmode plugin geofence.go
+RUN go build -o /build/geofence geofence.go
 
 
 FROM kong:2.5.0-ubuntu
 USER root
 RUN mkdir -p /plugins
-COPY --from=plugins /build/geofence.so /plugins
+COPY --from=plugins /build/geofence /plugins
 COPY --from=plugins /build/go-pluginserver/go-pluginserver /usr/local/bin
 USER kong
