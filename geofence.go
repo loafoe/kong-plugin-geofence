@@ -23,29 +23,31 @@ func New() interface{} {
 
 var dbMutex sync.Mutex
 
-func init() {
+func initDB() *geoip2.Reader {
 	dbMutex.Lock()
 	defer dbMutex.Unlock()
 
 	file, err := ioutil.TempFile("", "*.mmdb")
 	if err != nil {
-		fmt.Printf("%v\n", err)
-		return
+		dbErr = err
+		return nil
 	}
 	err = mmdb.Download(file.Name(), os.Getenv("LICENSE_KEY"))
 	if err != nil {
-		fmt.Printf("%v\n", err)
-		return
+		dbErr = err
+		return nil
 	}
 	db, err = geoip2.Open(file.Name())
 	if err != nil {
-		fmt.Printf("%v\n", err)
-		return
+		dbErr = err
+		return nil
 	}
-	fmt.Printf("Done: %s\n", file.Name())
+	return db
 }
 
-var db *geoip2.Reader
+var db = initDB()
+
+var dbErr error
 
 // Access implements the Access step
 func (conf Config) Access(kong *pdk.PDK) {
