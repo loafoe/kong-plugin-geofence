@@ -23,36 +23,34 @@ func New() interface{} {
 
 var dbMutex sync.Mutex
 
-func initDB() *geoip2.Reader {
+func init() {
 	dbMutex.Lock()
 	defer dbMutex.Unlock()
 
 	file, err := ioutil.TempFile("", "*.mmdb")
 	if err != nil {
 		dbErr = err
-		return nil
+		return
 	}
 	err = mmdb.Download(file.Name(), os.Getenv("LICENSE_KEY"))
 	if err != nil {
 		dbErr = err
-		return nil
+		return
 	}
 	db, err = geoip2.Open(file.Name())
 	if err != nil {
 		dbErr = err
-		return nil
+		return
 	}
-	return db
 }
 
-var db = initDB()
-
+var db *geoip2.Reader
 var dbErr error
 
 // Access implements the Access step
 func (conf Config) Access(kong *pdk.PDK) {
 	if db == nil {
-		_ = kong.ServiceRequest.SetHeader("X-Detected-Country-Error", "GeoIP database not ready")
+		_ = kong.ServiceRequest.SetHeader("X-Detected-Country-Error", fmt.Sprintf("GeoIP database not ready: %v", dbErr))
 		//headers := map[string][]string{
 		//	"X-Kong-Geofence": {"active"},
 		//}
