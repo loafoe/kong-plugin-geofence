@@ -11,7 +11,7 @@ COPY . .
 RUN go build -buildmode plugin geofence.go
 
 
-FROM kong:2.5.0-ubuntu
+FROM kong:2.5.1-ubuntu
 USER root
 RUN mkdir -p /plugins
 COPY --from=plugins /build/geofence.so /plugins
