@@ -51,13 +51,9 @@ var doOnce sync.Once
 var dbErr error
 
 // Access implements the Access step
-func (conf Config) Access(kong *pdk.PDK) {
+func (conf *Config) Access(kong *pdk.PDK) {
 	doOnce.Do(func() {
-		var err error
-		db, err = InitDB()
-		if err != nil {
-			_ = kong.Log.Err(err.Error())
-		}
+		db, dbErr = InitDB()
 	})
 	if db == nil {
 		_ = kong.ServiceRequest.SetHeader("X-Detected-Country-Error", fmt.Sprintf("GeoIP database not ready: %v", dbErr))
@@ -70,7 +66,6 @@ func (conf Config) Access(kong *pdk.PDK) {
 	clientIP, err := kong.Client.GetIp()
 	if err != nil {
 		_ = kong.ServiceRequest.SetHeader("X-Detected-Country-Error", err.Error())
-		_ = kong.Log.Err(err.Error())
 		return
 	}
 	_ = kong.ServiceRequest.SetHeader("X-Detected-IP", clientIP)
