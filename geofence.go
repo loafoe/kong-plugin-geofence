@@ -24,6 +24,7 @@ func New() interface{} {
 
 var dbMutex sync.Mutex
 
+//nolint
 func InitDB() (*geoip2.Reader, error) {
 	dbMutex.Lock()
 	defer dbMutex.Unlock()
@@ -47,14 +48,17 @@ func InitDB() (*geoip2.Reader, error) {
 }
 
 var db *geoip2.Reader
-var doOnce sync.Once
+
+//var doOnce sync.Once
 var dbErr error
 
 // Access implements the Access step
-func (conf *Config) Access(kong *pdk.PDK) {
-	doOnce.Do(func() {
-		db, dbErr = InitDB()
-	})
+func (conf Config) Access(kong *pdk.PDK) {
+	/*
+		doOnce.Do(func() {
+			db, dbErr = InitDB()
+		})
+	*/
 	if db == nil {
 		_ = kong.ServiceRequest.SetHeader("X-Detected-Country-Error", fmt.Sprintf("GeoIP database not ready: %v", dbErr))
 		headers := map[string][]string{
