@@ -30,6 +30,8 @@ func New() interface{} {
 	return &Config{}
 }
 
+var _ = New()
+
 var doOnce sync.Once
 var db *geoip2.Reader
 
