@@ -18,8 +18,8 @@ import (
 // Config
 type Config struct {
 	LicenseKey string `json:"license_key"`
-	AllowList  string `json:"allow_list,omitempty"`
-	DenyList   string `json:"deny_list,omitempty"`
+	AllowList  string `json:"allow_list"`
+	DenyList   string `json:"deny_list"`
 }
 
 //nolint
