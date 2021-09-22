@@ -8,12 +8,12 @@ The configured `license_key` will allow the plugin to download the database on-t
 
 ```yaml
 plugins:
-  - name: geofence
-    config:
-       license_key: XXX
-       countries_allow_list:
-         - NL
-         - SR
+- name: geofence
+  config:
+    license_key: XXX
+    countries_allow_list:
+    - NL
+    - SR
 ```
 
 ## fields
