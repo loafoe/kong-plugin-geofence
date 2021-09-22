@@ -18,8 +18,8 @@ import (
 // Config
 type Config struct {
 	LicenseKey string `json:"license_key"`
-	AllowList  string `json:"allow_list"`
-	DenyList   string `json:"deny_list"`
+	AllowList  string `json:"countries_allow_list"`
+	DenyList   string `json:"countries_deny_list"`
 }
 
 //nolint
@@ -51,15 +51,15 @@ func initDB(licenseKey string) (*geoip2.Reader, error) {
 }
 
 var db *geoip2.Reader
-var denyList []string
-var allowList []string
+var countriesDenyList []string
+var countriesAllowList []string
 
 var doOnce sync.Once
 var dbErr error
 
-func contains(s []string, searchterm string) bool {
-	i := sort.SearchStrings(s, searchterm)
-	return i < len(s) && s[i] == searchterm
+func contains(s []string, searchTerm string) bool {
+	i := sort.SearchStrings(s, searchTerm)
+	return i < len(s) && s[i] == searchTerm
 }
 
 // Access implements the Access step
@@ -68,10 +68,10 @@ func (conf Config) Access(kong *pdk.PDK) {
 	doOnce.Do(func() {
 		db, dbErr = initDB(conf.LicenseKey)
 		if len(conf.AllowList) > 0 {
-			allowList = strings.Split(conf.AllowList, ",")
+			countriesAllowList = strings.Split(conf.AllowList, ",")
 		}
 		if len(conf.DenyList) > 0 {
-			denyList = strings.Split(conf.DenyList, ",")
+			countriesDenyList = strings.Split(conf.DenyList, ",")
 		}
 	})
 
@@ -95,16 +95,20 @@ func (conf Config) Access(kong *pdk.PDK) {
 		_ = kong.ServiceRequest.SetHeader("X-Geofence-Detected-Country-Error", err.Error())
 		return
 	}
-	countryHeader := fmt.Sprintf("%v", record.Country.IsoCode)
-	_ = kong.ServiceRequest.SetHeader("X-Geofence-Detected-Country", countryHeader)
+	countryCode := fmt.Sprintf("%v", record.Country.IsoCode)
+	_ = kong.ServiceRequest.SetHeader("X-Geofence-Detected-Country", countryCode)
 
+	block := false
 	// Filter checks
-	if len(allowList) > 0 && contains(allowList, countryHeader) {
-		return
+	if len(countriesAllowList) > 0 && !contains(countriesAllowList, countryCode) {
+		block = true
 	}
-	if len(denyList) > 0 && contains(denyList, countryHeader) {
+	if len(countriesDenyList) > 0 && contains(countriesDenyList, countryCode) {
+		block = true
+	}
+	if block {
 		headers := map[string][]string{}
-		kong.Response.Exit(http.StatusUnauthorized, fmt.Sprintf("%s is blocked", countryHeader), headers)
+		kong.Response.Exit(http.StatusUnauthorized, "blocked\n", headers)
 		return
 	}
 }
