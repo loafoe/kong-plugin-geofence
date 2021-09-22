@@ -6,7 +6,6 @@ import (
 	"net"
 	"net/http"
 	"sort"
-	"strings"
 	"sync"
 
 	"github.com/Kong/go-pdk"
@@ -17,9 +16,9 @@ import (
 
 // Config
 type Config struct {
-	LicenseKey string `json:"license_key"`
-	AllowList  string `json:"countries_allow_list"`
-	DenyList   string `json:"countries_deny_list"`
+	LicenseKey         string   `json:"license_key"`
+	CountriesAllowList []string `json:"countries_allow_list"`
+	CountriesDenyList  []string `json:"countries_deny_list"`
 }
 
 //nolint
@@ -51,8 +50,6 @@ func initDB(licenseKey string) (*geoip2.Reader, error) {
 }
 
 var db *geoip2.Reader
-var countriesDenyList []string
-var countriesAllowList []string
 
 var doOnce sync.Once
 var dbErr error
@@ -67,12 +64,6 @@ func (conf Config) Access(kong *pdk.PDK) {
 
 	doOnce.Do(func() {
 		db, dbErr = initDB(conf.LicenseKey)
-		if len(conf.AllowList) > 0 {
-			countriesAllowList = strings.Split(conf.AllowList, ",")
-		}
-		if len(conf.DenyList) > 0 {
-			countriesDenyList = strings.Split(conf.DenyList, ",")
-		}
 	})
 
 	if db == nil {
@@ -100,10 +91,10 @@ func (conf Config) Access(kong *pdk.PDK) {
 
 	block := false
 	// Filter checks
-	if len(countriesAllowList) > 0 && !contains(countriesAllowList, countryCode) {
+	if len(conf.CountriesAllowList) > 0 && !contains(conf.CountriesAllowList, countryCode) {
 		block = true
 	}
-	if len(countriesDenyList) > 0 && contains(countriesDenyList, countryCode) {
+	if len(conf.CountriesDenyList) > 0 && contains(conf.CountriesDenyList, countryCode) {
 		block = true
 	}
 	if block {
