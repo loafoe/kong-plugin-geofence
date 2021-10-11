@@ -4,7 +4,18 @@ Kong plugin implementing geofencing. Supports fencing at Country level currently
 uses the excellent [MaxMind](https://dev.maxmind.com/geoip/geolite2-free-geolocation-data) GeoIP2 or GeoLite2 databases.
 The configured `license_key` will allow the plugin to download the database on-the-fly.
 
-## configuration
+## Kong environment
+
+```shell
+KONG_PLUGINS = "geofence,bundled"
+KONG_PLUGINSERVER_NAMES = "geofence"
+KONG_PLUGINSERVER_GEOFENCE_START_CMD = "/usr/local/bin/geofence"
+KONG_PLUGINSERVER_GEOFENCE_QUERY_CMD = "/usr/local/bin/geofence -dump"
+```
+
+## Kong configuration
+
+### Declarative
 
 ```yaml
 plugins:
