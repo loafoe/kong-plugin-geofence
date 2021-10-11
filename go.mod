@@ -1,4 +1,4 @@
-module github.com/philips-labs/kong-plugin-introspect
+module github.com/loafoe/kong-plugin-geofence
 
 go 1.16
 
