@@ -9,7 +9,7 @@ COPY . .
 RUN go build -o /build/geofence geofence.go
 
 
-FROM kong:2.7.1-alpine
+FROM kong:2.8.0-alpine
 USER root
 COPY --from=builder /build/geofence /usr/local/bin
 USER kong
