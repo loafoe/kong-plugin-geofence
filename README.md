@@ -29,7 +29,7 @@ plugins:
 
 ## fields
 
-* `config.license_key` - (Required) The MaxMind [license key](https://support.maxmind.com/account-faq/license-keys/how-do-i-generate-a-license-key/) to use
+* `config.license_key` - (Required) The MaxMind [license key](https://support.maxmind.com/hc/en-us/articles/4407111582235-Generate-a-License-Key) to use
 * `config.countries_allow_list` - (Optional) The list of country ISO codes to allow
 * `config.countries_deny_list` - (Optional) The list of country ISO codes to deny
 
